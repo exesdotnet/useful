@@ -56,7 +56,6 @@ select opt in $OPTIONS; do
 
 	elif [ "$opt" = "update" ]; then
 
-		sudo launchpad-getkeys
 		sudo dpkg --configure -a
 		sudo apt-get autoclean
 		sudo apt-get autoremove
