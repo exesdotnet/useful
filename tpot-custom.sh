@@ -1,5 +1,23 @@
 #!/bin/bash
 
+echo "Usage: $0 [ -s Setup ]"
+
+if [ "$1" = "-s" ]; then
+
+	sudo apt install nano
+	sudo apt install dig
+
+	sudo apt install -y snapd
+	# enable the snapd systemd service
+	#sudo systemctl enable --now snapd.socket
+
+	sudo snap install canonical-livepatch
+
+	sudo apt install unattended-upgrades
+	sudo dpkg-reconfigure unattended-upgrades
+
+fi
+
 function splitter {
 	echo '--------------------------------'
 }
@@ -43,12 +61,13 @@ echo 'iptables     - List iptables'
 echo 'ipblock      - Quick ip address blocking'
 echo 'flush        - Flush ip / Clean dns'
 echo 'bash-history - Search in .bash_history file'
+echo 'scripthost   - Create virtual host for apache (server)'
 echo 'download     - Download the latest of this script'
 echo 'blacklist    - Export and upload the blacklisted ip addresses'
 echo 'quit         - Exit script'
 splitter
 
-OPTIONS="update time repair reconfigure network iptables ipblock flush bash-history download blacklist quit"
+OPTIONS="update time repair reconfigure network iptables ipblock flush bash-history download livepatch quit"
 select opt in $OPTIONS; do
 	if [ "$opt" = "quit" ]; then
 		clear
@@ -56,6 +75,7 @@ select opt in $OPTIONS; do
 
 	elif [ "$opt" = "update" ]; then
 
+		sudo launchpad-getkeys
 		sudo dpkg --configure -a
 		sudo apt-get autoclean
 		sudo apt-get autoremove
@@ -112,7 +132,8 @@ select opt in $OPTIONS; do
 		ipt1=`echo $myexip2 | cut -d'.' -f1`
 		ipt2=`echo $myexip2 | cut -d'.' -f2`
 		ipt3=`echo $myexip2 | cut -d'.' -f3`
-		ipgateway="$ipt1.$ipt2.$ipt3.1"
+		#ipgateway="$ipt1.$ipt2.$ipt3.1"
+		ipgateway=`tracepath -b -n -m 2 community.sicherheitstacho.eu | grep 2\: | awk '{print $2}' | tail -1`
 
 		dig @$myexip2 +trace community.sicherheitstacho.eu
 		splitter
@@ -138,7 +159,7 @@ select opt in $OPTIONS; do
 
 		title "Command: ip route show table local"
 		sudo ip route show table local
-		title "---- Command: ip route show table main"
+		title "Command: ip route show table main"
 		sudo ip route show table main
 		title "Command: ip route show table default"
 		sudo ip route show table default
@@ -226,10 +247,15 @@ select opt in $OPTIONS; do
 
 		exit
 
-	elif [ "$opt" = "blacklist" ]; then
+	elif [ "$opt" = "livepatch" ]; then
 
-		#TODO: Export and upload blacklist
-		echo "[ TODO: Export and upload blacklist ]"
+		sudo canonical-livepatch disable `cat ~lpid.txt`
+		sudo canonical-livepatch enable `cat ~lpid.txt`
+		canonical-livepatch status --verbose
+
+		lsmod | grep livepatch
+
+		sudo canonical-livepatch disable `cat ~lpid.txt`
 
 	else
 		echo 'Wrong option'
@@ -243,7 +269,7 @@ select opt in $OPTIONS; do
 		echo '8) flush'
 		echo '9) bash-history'
 		echo '10) download'
-		echo '11) blacklist'
+		echo '11) livepatch'
 		echo '12) quit'
 	fi
 done
