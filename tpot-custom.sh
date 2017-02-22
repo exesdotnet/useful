@@ -283,9 +283,9 @@ select opt in $OPTIONS; do
 		iLen=${#iprl[@]}
 		for (( i=0; i<${iLen}; i++ )); do
 			echo "${iprl[$i]}"
-			sudo iptables -I INPUT -s "${iprl[$i]}" -j DROP
-			sudo iptables -I OUTPUT -s "${iprl[$i]}" -j DROP
-			sudo iptables -I FORWARD -s "${iprl[$i]}" -j DROP
+#			sudo iptables -I INPUT -s "${iprl[$i]}" -j DROP
+#			sudo iptables -I OUTPUT -s "${iprl[$i]}" -j DROP
+#			sudo iptables -I FORWARD -s "${iprl[$i]}" -j DROP
 		done
 
 		rm ~/tmp-iprangelist.txt
@@ -293,17 +293,17 @@ select opt in $OPTIONS; do
 	elif [ "$opt" = "docker" ]; then
 
 		sudo docker ps -a
-		sudo docker images
-		sudo docker network ls
+		sudo docker images | sort
+		sudo docker network ls | sort
 
 		echo "Do you like to remove old docker containers and images?"
 		read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
 
 		# Remove old docker containers
-		sudo docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs --no-run-if-empty sudo docker rm -f
-		#sudo docker rm $(sudo docker ps -q -f status=exited)
+		#sudo docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs --no-run-if-empty sudo docker rm -f
+		sudo docker rm $(sudo docker ps -q -f status=exited)
 		# Remove old images
-		sudo docker rmi $(sudo docker images -q -f "dangling=true")
+		sudo docker rmi $(sudo docker images -q -f dangling=true)
 
 	else
 		echo 'Wrong option'
