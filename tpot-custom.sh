@@ -2,10 +2,14 @@
 
 echo "Usage: $0 [ -s Setup ]"
 
+sudo modprobe -r bluetooth
+sudo modprobe -r mac_hid
+
 if [ "$1" = "-s" ]; then
 
 	sudo apt install nano
-	sudo apt install dig
+	sudo apt install dnsutils
+	sudo apt install iputils-tracepath
 
 	sudo apt install -y snapd
 	# enable the snapd systemd service
@@ -63,11 +67,13 @@ echo 'flush        - Flush ip / Clean dns'
 echo 'bash-history - Search in .bash_history file'
 echo 'scripthost   - Create virtual host for apache (server)'
 echo 'download     - Download the latest of this script'
-echo 'blacklist    - Export and upload the blacklisted ip addresses'
+echo 'livepatch    - Canonical livepatch'
+echo 'blocklist    - Internal temporary ip range blocking'
+echo 'docker       - Docker info / Remove old containers and images'
 echo 'quit         - Exit script'
 splitter
 
-OPTIONS="update time repair reconfigure network iptables ipblock flush bash-history download livepatch quit"
+OPTIONS="update time repair reconfigure network iptables ipblock flush bash-history download livepatch blocklist docker quit"
 select opt in $OPTIONS; do
 	if [ "$opt" = "quit" ]; then
 		clear
@@ -75,7 +81,6 @@ select opt in $OPTIONS; do
 
 	elif [ "$opt" = "update" ]; then
 
-		sudo launchpad-getkeys
 		sudo dpkg --configure -a
 		sudo apt-get autoclean
 		sudo apt-get autoremove
@@ -249,6 +254,10 @@ select opt in $OPTIONS; do
 
 	elif [ "$opt" = "livepatch" ]; then
 
+		echo "Please enter the livepatch id!"
+		read lpid
+		if [ "$lpid" != "" ]; then echo "$lpid" > ~lpid.txt ; fi
+
 		sudo canonical-livepatch disable `cat ~lpid.txt`
 		sudo canonical-livepatch enable `cat ~lpid.txt`
 		canonical-livepatch status --verbose
@@ -256,6 +265,45 @@ select opt in $OPTIONS; do
 		lsmod | grep livepatch
 
 		sudo canonical-livepatch disable `cat ~lpid.txt`
+
+	elif [ "$opt" = "blocklist" ]; then
+
+		# Just for testing
+		echo "5.45.84.0/22
+5.45.72.0/22
+210.14.32.0/20
+181.24.0.0/14
+79.64.0.0/12
+169.54.244.64/27" > ~/tmp-iprangelist.txt
+
+		OLDIFS=$IFS
+		IFS=$'\n'
+		iprl=($(cat ~/tmp-iprangelist.txt))
+		IFS=$OLDIFS
+		iLen=${#iprl[@]}
+		for (( i=0; i<${iLen}; i++ )); do
+			echo "${iprl[$i]}"
+#			sudo iptables -I INPUT -s "${iprl[$i]}" -j DROP
+#			sudo iptables -I OUTPUT -s "${iprl[$i]}" -j DROP
+#			sudo iptables -I FORWARD -s "${iprl[$i]}" -j DROP
+		done
+
+		rm ~/tmp-iprangelist.txt
+
+	elif [ "$opt" = "docker" ]; then
+
+		sudo docker ps -a
+		sudo docker images
+		sudo docker network ls
+
+		echo "Do you like to remove old docker containers and images?"
+		read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
+
+		# Remove old docker containers
+		sudo docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs --no-run-if-empty sudo docker rm -f
+		#sudo docker rm $(sudo docker ps -q -f status=exited)
+		# Remove old images
+		sudo docker rmi $(sudo docker images -q -f "dangling=true")
 
 	else
 		echo 'Wrong option'
@@ -270,6 +318,8 @@ select opt in $OPTIONS; do
 		echo '9) bash-history'
 		echo '10) download'
 		echo '11) livepatch'
-		echo '12) quit'
+		echo '12) blocklist'
+		echo '13) docker'
+		echo '14) quit'
 	fi
 done
