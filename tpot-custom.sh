@@ -274,7 +274,8 @@ select opt in $OPTIONS; do
 210.14.32.0/20
 181.24.0.0/14
 79.64.0.0/12
-169.54.244.64/27" > ~/tmp-iprangelist.txt
+169.54.244.64/27
+5.45.76.0/22" > ~/tmp-iprangelist.txt
 
 		OLDIFS=$IFS
 		IFS=$'\n'
