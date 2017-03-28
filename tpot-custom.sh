@@ -10,6 +10,10 @@ if [ "$1" = "-s" ]; then
 	sudo apt install nano
 	sudo apt install dnsutils
 	sudo apt install iputils-tracepath
+	#sudo apt install iputils-arping
+	sudo apt install secure-delete
+
+	read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
 
 	sudo apt install -y snapd
 	# enable the snapd systemd service
@@ -268,14 +272,29 @@ select opt in $OPTIONS; do
 
 	elif [ "$opt" = "blocklist" ]; then
 
-		# Just for testing
-		echo "5.45.84.0/22
+		# Just for testing ;)
+		echo "1.54.176.0/20
+1.56.0.0/13
+5.45.64.0/21
+5.45.64.0/21
 5.45.72.0/22
-210.14.32.0/20
-181.24.0.0/14
+5.45.76.0/22
+5.45.84.0/22
+42.62.0.0/17
+46.174.184.0/21
 79.64.0.0/12
+87.0.0.0/12
+91.195.102.0/23
+94.102.52.0/22
+120.56.0.0/13
+121.160.0.0/11
 169.54.244.64/27
-5.45.76.0/22" > ~/tmp-iprangelist.txt
+181.24.0.0/14
+188.18.64.0/19
+194.88.104.0/22
+195.22.124.0/22
+210.14.32.0/20
+221.224.0.0/13" > ~/tmp-iprangelist.txt
 
 		OLDIFS=$IFS
 		IFS=$'\n'
