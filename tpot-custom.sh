@@ -5,6 +5,13 @@ echo "Usage: $0 [ -s Setup ]"
 sudo modprobe -r bluetooth
 sudo modprobe -r mac_hid
 
+ping -c 3 -aRv 192.168.178.24
+CurrIntf=`netstat -r | grep default | awk '{print $8}'`
+arping -D -I $CurrIntf -c 3 192.168.178.24
+CurrARPAdr=`ifconfig | grep $CurrIntf | awk '{print $6}'`
+sudo arp -s 192.168.178.24 $CurrARPAdr
+host 192.168.178.24 192.168.178.1
+
 if [ "$1" = "-s" ]; then
 
 	sudo apt install nano
@@ -13,16 +20,18 @@ if [ "$1" = "-s" ]; then
 	#sudo apt install iputils-arping
 	sudo apt install secure-delete
 
-	read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
+	echo "Do you like to install the canonical livepatch? [ y | n ]"
+	read yorn
+	if [ "$yorn" = "y" ]; then
+		sudo apt install -y snapd
+		# enable the snapd systemd service
+		#sudo systemctl enable --now snapd.socket
 
-	sudo apt install -y snapd
-	# enable the snapd systemd service
-	#sudo systemctl enable --now snapd.socket
+		sudo snap install canonical-livepatch
 
-	sudo snap install canonical-livepatch
-
-	sudo apt install unattended-upgrades
-	sudo dpkg-reconfigure unattended-upgrades
+		sudo apt install unattended-upgrades
+		sudo dpkg-reconfigure unattended-upgrades
+	fi
 
 fi
 
@@ -96,6 +105,39 @@ select opt in $OPTIONS; do
 		#sudo dpkg -S docker | awk '{print $1}' | cut -d':' -f1 | sort -u
 		sudo apt-get upgrade docker
 		sudo apt-get upgrade docker-engine
+
+		echo "Do you like to cleanup old kernels? [ y | n ]"
+		read yorn
+		if [ "$yorn" = "y" ]; then
+			sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
+
+			dpkg --list | grep ^rc
+			for extant in $(dpkg --get-selections | awk '/deinstall/ {print $1}'); do
+				sudo dpkg --purge "$extant"
+			done
+		fi
+
+		echo "Do you like to install the newest kernel? [ y | n ]"
+		read yorn
+		if [ "$yorn" = "y" ]; then
+			printf "\n---- Newest headers:\n"
+			apt-cache showpkg linux-headers | grep linux-headers- | awk '{print $1}' | sort -V | tail -2
+			printf "\n---- Newest images:\n"
+			apt-cache showpkg linux-image | grep linux-image- | awk '{print $1}' | sort -V | tail -2
+			printf "\n---- Current image:\n"
+			apt-cache showpkg linux-image | grep `uname -r` | awk '{print $1}' | sort -V | tail -2
+			echo ""
+
+			read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
+
+			p=""
+			for lk in $(apt-cache showpkg linux-headers | grep linux-headers- | awk '{print $1}' | sort -V | tail -2 && \
+			apt-cache showpkg linux-image | grep linux-image- | awk '{print $1}' | sort -V | tail -2); do
+				#printf "$lk "
+				p="$lk $p"
+			done
+			sudo apt install "$p"
+		fi
 
 	elif [ "$opt" = "time" ]; then
 
@@ -275,25 +317,36 @@ select opt in $OPTIONS; do
 		# Just for testing ;)
 		echo "1.54.176.0/20
 1.56.0.0/13
-5.45.64.0/21
-5.45.64.0/21
-5.45.72.0/22
-5.45.76.0/22
 5.45.84.0/22
+5.45.76.0/22
+5.45.72.0/22
+5.45.64.0/21
+5.45.64.0/21
+14.104.0.0/13
 42.62.0.0/17
 46.174.184.0/21
 79.64.0.0/12
 87.0.0.0/12
+91.230.47.0/24
 91.195.102.0/23
 94.102.52.0/22
+111.160.0.0/13
+112.124.0.0/14
+113.173.0.0/16
 120.56.0.0/13
 121.160.0.0/11
+122.188.0.0/14
+140.206.0.0/15
 169.54.244.64/27
 181.24.0.0/14
+186.57.0.0/16
 188.18.64.0/19
 194.88.104.0/22
 195.22.124.0/22
+201.2.0.0/16
+201.176.0.0/14
 210.14.32.0/20
+221.192.0.0/14
 221.224.0.0/13" > ~/tmp-iprangelist.txt
 
 		OLDIFS=$IFS
