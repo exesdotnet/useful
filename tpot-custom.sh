@@ -8,8 +8,10 @@ sudo modprobe -r mac_hid
 ping -c 3 -aRv 192.168.178.24
 CurrIntf=`netstat -r | grep default | awk '{print $8}'`
 arping -D -I $CurrIntf -c 3 192.168.178.24
-CurrARPAdr=`ifconfig | grep $CurrIntf | awk '{print $6}'`
-sudo arp -s 192.168.178.24 $CurrARPAdr
+CurrARPAdr=`ifconfig | grep $CurrIntf | awk '{print $5}'` # in German output use field 6
+echo $CurrARPAdr
+#sudo arp -s 192.168.178.24 $CurrARPAdr
+#sudo arp -Ds 192.168.178.24 $CurrIntf
 host 192.168.178.24 192.168.178.1
 
 if [ "$1" = "-s" ]; then
@@ -17,7 +19,7 @@ if [ "$1" = "-s" ]; then
 	sudo apt install nano
 	sudo apt install dnsutils
 	sudo apt install iputils-tracepath
-	#sudo apt install iputils-arping
+	sudo apt install iputils-arping
 	sudo apt install secure-delete
 
 	echo "Do you like to install the canonical livepatch? [ y | n ]"
@@ -128,15 +130,22 @@ select opt in $OPTIONS; do
 			apt-cache showpkg linux-image | grep `uname -r` | awk '{print $1}' | sort -V | tail -2
 			echo ""
 
+			echo "In the next step you see all available kernels."
 			read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
 
-			p=""
-			for lk in $(apt-cache showpkg linux-headers | grep linux-headers- | awk '{print $1}' | sort -V | tail -2 && \
-			apt-cache showpkg linux-image | grep linux-image- | awk '{print $1}' | sort -V | tail -2); do
-				#printf "$lk "
-				p="$lk $p"
-			done
-			sudo apt install "$p"
+			apt-cache showpkg linux-image | grep linux-image- | awk '{print $1}' | less
+			read -rsp $'Press [Enter] to continue or [Ctrl + C] to exit!\n'
+
+			NewestVers=`apt-cache showpkg linux-image | grep linux-image- | awk '{print $1}' | sort -V | grep generic | rev | cut -d'-' -f2-3 | rev`
+
+			echo "If you leave it blank version $NewestVers will be installed."
+			echo "Please enter the version number! For example [ `uname -r | rev | cut -d'-' -f2-3 | rev` ]"
+			read vern
+			if [ "$vern" = "" ]; then
+				sudo apt install linux-image-$NewestVers-generic linux-image-$NewestVers-headers
+			else
+				sudo apt install linux-image-$vern-generic linux-image-$vern-headers
+			fi
 		fi
 
 	elif [ "$opt" = "time" ]; then
@@ -325,11 +334,14 @@ select opt in $OPTIONS; do
 14.104.0.0/13
 42.62.0.0/17
 46.174.184.0/21
+59.44.0.0/14
+62.169.184.0/21
 79.64.0.0/12
 87.0.0.0/12
 91.230.47.0/24
 91.195.102.0/23
 94.102.52.0/22
+110.177.0.0/16
 111.160.0.0/13
 112.124.0.0/14
 113.173.0.0/16
