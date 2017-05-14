@@ -34,4 +34,5 @@ cp ~/tpot-custom.sh ~/tpot-custom.sh.bak
 echo ""
 echo "Later remove the scripts with command 'sudo rm -f *.sh'!"
 echo "Additionally execute 'mv ~/tpot-custom.sh.bak ~/tpot-custom.sh'!"
+echo ""
 
