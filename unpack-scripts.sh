@@ -3,8 +3,8 @@
 cd $HOME
 git clone https://github.com/exesdotnet/useful.git
 cd $HOME/useful
-git branch
-git checkout master
+#git branch
+#git checkout master
 
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/unpack-scripts.sh -O ~/unpack-scripts.sh
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/scripts.tgz.cry -O ~/scripts.tgz.cry
