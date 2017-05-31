@@ -35,6 +35,7 @@ rm ~/scripts.tgz.cry
 rm ~/scripts.tgz
 
 chmod ugo+x ~/*.sh
+chmod ugo-x ~/*.txt
 
 cp ~/tpot-custom.sh ~/tpot-custom.sh.bak
 
