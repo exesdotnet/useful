@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -d ~/useful ]; then
+	rm -Rf ~/useful
+fi
+
 cd $HOME
 git clone https://github.com/exesdotnet/useful.git
 cd $HOME/useful
@@ -9,8 +13,10 @@ cd $HOME/useful
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/unpack-scripts.sh -O ~/unpack-scripts.sh
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/scripts.tgz.cry -O ~/scripts.tgz.cry
 
-#chmod u+x ~/useful/unpack-scripts.sh
-#~/useful/unpack-scripts.sh
+if [ ! -f ~/unpack-scripts.sh ]; then
+	chmod u+x ~/useful/unpack-scripts.sh
+	~/useful/unpack-scripts.sh
+fi
 
 cp ~/useful/unpack-scripts.sh ~/unpack-scripts.sh
 cp ~/useful/scripts.tgz.cry ~/scripts.tgz.cry
