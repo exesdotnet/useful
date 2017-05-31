@@ -9,7 +9,8 @@ cd $HOME/useful
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/unpack-scripts.sh -O ~/unpack-scripts.sh
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/scripts.tgz.cry -O ~/scripts.tgz.cry
 
-#chmod u+x ~/unpack-scripts.sh
+#chmod u+x ~/useful/unpack-scripts.sh
+#~/useful/unpack-scripts.sh
 
 cp ~/useful/unpack-scripts.sh ~/unpack-scripts.sh
 cp ~/useful/scripts.tgz.cry ~/scripts.tgz.cry
