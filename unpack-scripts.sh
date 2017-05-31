@@ -13,7 +13,7 @@ cd $HOME/useful
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/unpack-scripts.sh -O ~/unpack-scripts.sh
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/scripts.tgz.cry -O ~/scripts.tgz.cry
 
-if [ ! -f ~/unpack-scripts.sh ]; then
+if [ ! -f "~/unpack-scripts.sh" ]; then
 	chmod u+x ~/useful/unpack-scripts.sh
 	~/useful/unpack-scripts.sh
 fi
