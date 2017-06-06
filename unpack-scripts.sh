@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function error_exit() {
+	echo "$1" 1>&2
+	exit 1
+}
+
 if [ -d ~/useful ]; then
 	rm -Rf ~/useful
 fi
@@ -15,7 +20,7 @@ cd $HOME/useful
 
 if [ ! -f "~/unpack-scripts.sh" ]; then
 	chmod u+x ~/useful/unpack-scripts.sh
-	~/useful/unpack-scripts.sh
+	#~/useful/unpack-scripts.sh
 fi
 
 cp ~/useful/unpack-scripts.sh ~/unpack-scripts.sh
