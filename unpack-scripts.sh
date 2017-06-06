@@ -40,7 +40,7 @@ chmod ugo-x ~/*.txt
 cp ~/tpot-custom.sh ~/tpot-custom.sh.bak
 
 echo ""
-echo "Later remove the scripts with command 'sudo rm -f *.sh'!"
+echo "Later remove the scripts with command 'sudo rm -f *.sh; rm -f *.log; rm -f ~/resizer-windows.txt; rm -f  ~/3rd.txt'!"
 echo "Additionally execute 'mv ~/tpot-custom.sh.bak ~/tpot-custom.sh'!"
 echo ""
 
