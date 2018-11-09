@@ -19,7 +19,7 @@ cd $HOME/useful
 #wget https://raw.githubusercontent.com/exesdotnet/useful/master/scripts.tgz.cry -O ~/scripts.tgz.cry
 
 if [ ! -f "~/unpack-scripts.sh" ]; then
-	chmod u+x ~/useful/unpack-scripts.sh
+	chmod 750 ~/useful/unpack-scripts.sh
 	#~/useful/unpack-scripts.sh
 fi
 
@@ -39,8 +39,8 @@ tar -xvzf ~/scripts.tgz
 rm ~/scripts.tgz.cry
 rm ~/scripts.tgz
 
-chmod ugo+x ~/*.sh
-chmod ugo-x ~/*.txt
+chmod 770 ~/*.sh
+chmod 640 ~/*.txt
 
 cp ~/tpot-custom.sh ~/tpot-custom.sh.bak
 
