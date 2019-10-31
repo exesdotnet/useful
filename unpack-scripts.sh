@@ -28,7 +28,8 @@ cp ~/useful/scripts.tgz.cry ~/scripts.tgz.cry
 
 cd $HOME
 
-if openssl aes-256-cbc -d -a -in ~/scripts.tgz.cry -out ~/scripts.tgz ; then
+if openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -salt -d -in ~/scripts.tgz.cry -out ~/scripts.tgz ; then
+#if openssl aes-256-cbc -d -a -in ~/scripts.tgz.cry -out ~/scripts.tgz ; then
 	echo "[ Decryption is fine! ]"
 else
 	error_exit "[ Error occured! Aborting. ]"
